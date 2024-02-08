@@ -8,12 +8,14 @@ import time
 import os
 
 wake_word = 'jarvis'
-model = GPT4All("/Users/YOUR_USERNAME_HERE/Library/Application Support/nomic.ai/GPT4All/ggml-model-gpt4all-falcon-q4_0.bin", allow_download=False)
+model = GPT4All("/Users/sudu/Library/Application Support/nomic.ai/GPT4All/gpt4all-falcon-newbpe-q4_0.gguf", allow_download=False)
 r = sr.Recognizer()
-tiny_model_path = os.path.expanduser('~/.cache/whisper/tiny.pt')
-base_model_path = os.path.expanduser('~/.cache/whisper/base.pt')
-tiny_model = whisper.load_model(tiny_model_path)
-base_model = whisper.load_model(base_model_path)
+# tiny_model_path = os.path.expanduser('~/.cache/whisper/tiny.pt')
+# base_model_path = os.path.expanduser('~/.cache/whisper/base.pt')
+
+tiny_model = whisper.load_model("tiny.en") # no need to point to cache with new whisper library. 
+base_model = whisper.load_model("base.en") 
+
 listening_for_wake_word = True
 source = sr.Microphone() 
 warnings.filterwarnings("ignore", category=UserWarning, module='whisper.transcribe', lineno=114)
