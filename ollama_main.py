@@ -5,33 +5,32 @@ import sys
 import whisper
 import warnings
 import time
-import os
+import ollama
 
 wake_word = 'jarvis'
-model = GPT4All("/Users/sudu/Library/Application Support/nomic.ai/GPT4All/gpt4all-falcon-newbpe-q4_0.gguf", allow_download=False)
+# model = GPT4All("/Users/sudu/Library/Application Support/nomic.ai/GPT4All/gpt4all-falcon-newbpe-q4_0.gguf", allow_download=False)
+# model = ollama.load_model('mistral')  # Load the local mistral model
 r = sr.Recognizer()
-# tiny_model_path = os.path.expanduser('~/.cache/whisper/tiny.pt')
-# base_model_path = os.path.expanduser('~/.cache/whisper/base.pt')
 
-tiny_model = whisper.load_model("tiny.en") # no need to point to cache with new whisper library. 
-base_model = whisper.load_model("base.en") 
+tiny_model = whisper.load_model("tiny.en", in_memory=True,) # no need to point to cache with new whisper library.
+base_model = whisper.load_model("base.en", in_memory=True)
 
 listening_for_wake_word = True
-source = sr.Microphone() 
+source = sr.Microphone(device_index=0, sample_rate=44100, chunk_size=1024,)
 warnings.filterwarnings("ignore", category=UserWarning, module='whisper.transcribe', lineno=114)
 
 if sys.platform != 'darwin':
-    import pyttsx3
-    engine = pyttsx3.init() 
+        import pyttsx3
+        engine = pyttsx3.init()
 
 def speak(text):
-    if sys.platform == 'darwin':
-        ALLOWED_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?!-_$:+-/ ")
-        clean_text = ''.join(c for c in text if c in ALLOWED_CHARS)
-        system(f"say '{clean_text}'")
-    else:
-        engine.say(text)
-        engine.runAndWait()
+  if sys.platform == 'darwin':
+    ALLOWED_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,?!-_$:+-/ ")
+    clean_text = ''.join(c for c in text if c in ALLOWED_CHARS)
+    system(f"say '{clean_text}'")
+  else:
+    engine.say(text)
+    engine.runAndWait()
 
 def listen_for_wake_word(audio):
     global listening_for_wake_word
@@ -44,7 +43,7 @@ def listen_for_wake_word(audio):
         speak('Listening')
         listening_for_wake_word = False
 
-def prompt_gpt(audio):
+def prompt_ollama(audio):
     global listening_for_wake_word
     try:
         with open("prompt.wav", "wb") as f:
@@ -57,20 +56,21 @@ def prompt_gpt(audio):
             listening_for_wake_word = True
         else:
             print('User: ' + prompt_text)
-            output = model.generate(prompt_text, max_tokens=200)
-            print('GPT4All: ', output)
+            response = ollama.chat(model='mistral', messages=[{'role': 'user', 'content': prompt_text}], )
+            output = response['message']['content']
+            print('Ollama: ', output)
             speak(output)
             print('\nSay', wake_word, 'to wake me up. \n')
             listening_for_wake_word = True
     except Exception as e:
         print("Prompt error: ", e)
-
+    
 def callback(recognizer, audio):
     global listening_for_wake_word
     if listening_for_wake_word:
         listen_for_wake_word(audio)
     else:
-        prompt_gpt(audio)
+        prompt_ollama(audio)
 
 def start_listening():
     with source as s:
@@ -81,4 +81,4 @@ def start_listening():
         time.sleep(1) 
 
 if __name__ == '__main__':
-    start_listening() 
+        start_listening()
