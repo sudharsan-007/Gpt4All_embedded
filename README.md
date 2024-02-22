@@ -1,6 +1,27 @@
-# GPT4ALL-Voice-Assistant
-This is a 100% offline GPT4ALL Voice Assistant. Completely open source and privacy friendly. Use any language model on GPT4ALL. Background process voice detection. Watch the full YouTube tutorial for setup guide: https://youtu.be/6zAk0KHmiGw
+# GPT4ALL and ollama Voice-Assistant
+
+This is an active repo making code to run multiple different LLMs in Embedded Devices such as Raspberry pi, Jetson. Currently testing Faster Whisper to optimize and speed up the model. Also trying to add some kind of check, so that the code doesnt keep recording. 
+
 ## Setup
-I highly advise watching the YouTube tutorial to use this code. You will need to modify the OpenAI whisper library to work offline and I walk through that in the video as well as setting up all the other dependencies to function properly. 
-## Improvements to think about adding to yours
-Give a system prompt. These open source models perform far better when you send a system prompt as specified in the GPT4ALL documentation: https://docs.gpt4all.io/gpt4all_python.html#introspection
+
+MacOS install portaudio 
+Install rquirements.txt using PIP
+
+## To Do
+
+* Faster Whisper (works in python 3.10, not on 3.12, Error during pip install AV* which is a prerequisite) 
+* Use int8 instead of float32 for performance 
+* Docker Support 
+* Multiple model calling with different names
+
+Function to remake: 
+1. Voice to Text 
+2. Text to Speech (using whisper base model)
+3. Listen for key word call (using whisper tiny model)
+4. Pass Text ollama 
+5. Pass text GPT4All 
+6. Print ollama and GPT4All texts 
+
+**Test on Raspberry pi**
+**Test on Jetson Nano** 
+
